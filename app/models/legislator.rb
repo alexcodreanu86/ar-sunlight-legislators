@@ -1,5 +1,7 @@
 require_relative '../../db/config'
 require 'sqlite3'
+require 'twitter'
+require 'faraday'
 
 class Legislator < ActiveRecord::Base
   def self.state_legislators(state)
@@ -42,6 +44,16 @@ class Legislator < ActiveRecord::Base
     self.destroy_all(in_office: 0)
   end
 
+
+  def self.client
+    client = Twitter::Rest::Client.new do |config|
+      config.consumer_key        = "T24igtl0M6Yb6AFZLNKw"
+      config.consumer_secret     = "Jdm7jruNEakvhVWVpnxm5XOwt0c6ebLQyVPN4KWnBM"
+      # config.access_token        = "YOUR_ACCESS_TOKEN"
+      # config.access_token_secret = "YOUR_ACCESS_SECRET"
+    end
+    client
+  end
 
 end
 

@@ -47,8 +47,8 @@ class Legislator < ActiveRecord::Base
 
   def self.client
     client = Twitter::Rest::Client.new do |config|
-      config.consumer_key        = "T24igtl0M6Yb6AFZLNKw"
-      config.consumer_secret     = "Jdm7jruNEakvhVWVpnxm5XOwt0c6ebLQyVPN4KWnBM"
+      config.consumer_key        = 
+      config.consumer_secret     = 
       # config.access_token        = "YOUR_ACCESS_TOKEN"
       # config.access_token_secret = "YOUR_ACCESS_SECRET"
     end

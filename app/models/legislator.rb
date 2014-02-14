@@ -1,9 +1,11 @@
 require_relative '../../db/config'
+require_relative 'tweets.rb'
 require 'sqlite3'
 require 'twitter'
 require 'faraday'
 
 class Legislator < ActiveRecord::Base
+  has_many :tweets
   def self.state_legislators(state)
     puts "Senators:"
       self.where("state = ? AND title = 'Sen'", state).each {|leg| puts "\t#{leg.firstname} #{leg.lastname} (#{leg.party})" }
@@ -40,22 +42,43 @@ class Legislator < ActiveRecord::Base
     puts "Representatives: #{representatives}"
   end
 
-  def delete_inactive_legislators
+  def self.delete_inactive_legislators
     self.destroy_all(in_office: 0)
   end
 
 
   def self.client
-    client = Twitter::Rest::Client.new do |config|
-      config.consumer_key        = 
-      config.consumer_secret     = 
-      # config.access_token        = "YOUR_ACCESS_TOKEN"
-      # config.access_token_secret = "YOUR_ACCESS_SECRET"
+    client = Twitter::REST::Client.new do |config|
+      config.consumer_key        =
+      config.consumer_secret     =
+      config.access_token        =
+      config.access_token_secret =
     end
     client
   end
 
+  def self.search(twitter_id, amount)
+    tweets = client.search(twitter_id, :result_type => "recent").take(amount)
+  end
+
+  def self.grab_twitter_ids
+    self.all.map(&:twitter_id)
+  end
+
+  def get_last_tweets
+    if twitter_id != ""
+      tweets = self.class.search(twitter_id, 10)
+      save_tweets(tweets)
+      tweets
+    else
+      puts "This Legislator has no twitter id..... Sucker"
+    end
+  end
+
+  def save_tweets(tweets_container)
+    tweets_container.each do |twt|
+      self.tweets << Tweet.new(tweet: twt.text, tweet_id: twt.id)
+    end
+  end
 end
-
-
 # Legislator.select("state, title").group("state","title").order("count(id)").count
